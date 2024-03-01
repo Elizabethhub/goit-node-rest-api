@@ -1,8 +1,12 @@
 import express from "express";
 import morgan from "morgan";
 import cors from "cors";
+import mongoose from "mongoose";
+import dotenv from "dotenv";
 
 import contactsRouter from "./routes/contactsRouter.js";
+
+dotenv.config(); // founds .env file, reads it and add its data to global process.env obj
 
 const app = express();
 
@@ -20,7 +24,20 @@ app.use((err, req, res, next) => {
   const { status = 500, message = "Server error" } = err;
   res.status(status).json({ message });
 });
+//WM3J2XgMX0C2pYaj
 
-app.listen(3000, () => {
-  console.log("Server is running. Use our API on port: 3000");
-});
+const { DB_HOST, PORT = 4000 } = process.env;
+
+mongoose
+  .connect(DB_HOST)
+  .then(() => {
+    app.listen(PORT, () => {
+      console.log(
+        `Database connection successful. Use our API on port: ${PORT}`
+      );
+    });
+  })
+  .catch((err) => {
+    console.log(err.message);
+    process.exit(1); // close all started processes
+  });
