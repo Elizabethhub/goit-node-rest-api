@@ -1,52 +1,25 @@
-import fs from "fs/promises";
-import path from "path";
-import { nanoid } from "nanoid";
+import Contact from "../models/Contact.js";
 
-const contactsPath = path.resolve("db", "contacts.json");
+export const getAllContacts = () => Contact.find();
+//   Contact.find(
+//     {
+//       favorite: true, // search criterias
+//     },
+//     "-name -phone" // what fields we want to get from db or "-name -phone" for exception
+//   );
 
-const updateContacts = (contacts) =>
-  fs.writeFile(contactsPath, JSON.stringify(contacts, null, 2));
-
-export const getAllContacts = async () => {
-  const buffer = await fs.readFile(contactsPath);
-  return JSON.parse(buffer);
-};
-
-export async function getContactById(contactId) {
-  const contacts = await getAllContacts();
-  const result = contacts.find((item) => item.id === contactId);
-  return result || null;
+export function getContactById(contactId) {
+  return Contact.findById(contactId); // finds first match or null
+  //   return Contact.findOne({ _id: contactId }); // finds first match or null
 }
 
-export async function removeContact(contactId) {
-  const contacts = await getAllContacts();
-  const index = contacts.findIndex((item) => item.id === contactId);
-  if (index === -1) {
-    return null;
-  }
-  const [result] = contacts.splice(index, 1);
-  await updateContacts(contacts);
-  return result;
+export function removeContact(contactId) {
+  //   return Contact.findByIdAndRemove(id);
+  return Contact.findByIdAndDelete(contactId); // delete by id or return null
 }
 
-export const addContact = async (data) => {
-  const contacts = await getAllContacts();
-  const newContact = {
-    id: nanoid(),
-    ...data,
-  };
-  contacts.push(newContact);
-  await updateContacts(contacts);
-  return newContact;
-};
+export const addContact = (data) => Contact.create(data);
 
-export const updateContactById = async (id, data) => {
-  const contacts = await getAllContacts();
-  const index = contacts.findIndex((item) => item.id === id);
-  if (index === -1) {
-    return null;
-  }
-  contacts[index] = { ...contacts[index], ...data };
-  await updateContacts(contacts);
-  return contacts[index];
-};
+export const updateContactById = (id, data) =>
+  Contact.findByIdAndUpdate(id, data); // by default returns old obj if {new: true} isn't added
+// runValidators - to run scheme validation during update

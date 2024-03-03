@@ -7,6 +7,7 @@ import dotenv from "dotenv";
 import contactsRouter from "./routes/contactsRouter.js";
 
 dotenv.config(); // founds .env file, reads it and add its data to global process.env obj
+// possible to change imporat as import "dotenv/config" to replace lines 5 & 9
 
 const app = express();
 
