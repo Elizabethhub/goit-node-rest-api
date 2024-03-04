@@ -40,3 +40,12 @@ export const updateContact = ctrlWrapper(async (req, res) => {
   }
   res.json(result);
 });
+
+export const updateStatusContact = ctrlWrapper(async (req, res) => {
+  const { id } = req.params;
+  const result = await contactsService.updateStatus(id, req.body);
+  if (!result) {
+    throw HttpError(404);
+  }
+  res.json(result);
+});
