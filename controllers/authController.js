@@ -2,6 +2,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
 import * as authServices from "../services/authServices.js";
+import * as userServices from "../services/userServices.js";
 
 import ctrlWrapper from "../decorators/ctrlWrapper.js";
 
@@ -11,7 +12,7 @@ const { JWT_SECRET } = process.env;
 
 const signup = async (req, res) => {
   const { email } = req.body;
-  const user = await authServices.findUser({ email });
+  const user = await userServices.findUser({ email });
   if (user) {
     throw HttpError(409, "email already used");
   }
@@ -24,7 +25,7 @@ const signup = async (req, res) => {
 
 const signin = async (req, res) => {
   const { email, password } = req.body;
-  const user = await authServices.findUser({ email });
+  const user = await userServices.findUser({ email });
   if (!user) {
     throw HttpError(401, "Email or password invalid"); //"Email invalid"
   }
@@ -34,12 +35,7 @@ const signin = async (req, res) => {
   }
   const payload = { id: user._id };
   const token = jwt.sign(payload, JWT_SECRET, { expiresIn: "23h" });
-
-  //   try {
-  //     const { id } = jwt.verify(token, JWT_SECRET); // checks if was this token crypted by this secretKey
-  //   } catch (error) {
-  //     console.log("error.message", error.message);
-  //   }
+  await authServices.setToken(user._id, token);
 
   res.json({
     token,
@@ -47,7 +43,26 @@ const signin = async (req, res) => {
   });
 };
 
+const signout = async (req, res) => {
+  const { _id } = req.user;
+  await authServices.setToken(_id);
+
+  res.json({
+    message: "Signout success",
+  });
+};
+
+const getCurrent = async (req, res) => {
+  const { email, username } = req.user;
+  res.json({
+    email,
+    username,
+  });
+};
+
 export default {
   signup: ctrlWrapper(signup),
   signin: ctrlWrapper(signin),
+  signout: ctrlWrapper(signout),
+  getCurrent: ctrlWrapper(getCurrent),
 };

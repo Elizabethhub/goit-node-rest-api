@@ -5,6 +5,7 @@ export const signupSchema = Joi.object({
   username: Joi.string().required(),
   email: Joi.string().pattern(emailRegexp).required(), // email() will has different validation than indicated in Schema for email, that's why pattern() is better
   password: Joi.string().min(6).required(),
+  subscription: Joi.string(),
 });
 
 export const signinSchema = Joi.object({

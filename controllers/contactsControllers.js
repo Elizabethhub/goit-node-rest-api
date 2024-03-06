@@ -5,13 +5,18 @@ import ctrlWrapper from "../decorators/ctrlWrapper.js";
 import HttpError from "../helpers/HttpError.js";
 
 export const getAllContacts = ctrlWrapper(async (req, res) => {
-  const result = await contactsService.getAllContacts();
-  res.json(result);
+  const { _id: owner } = req.user;
+  const { page = 1, limit = 10 } = req.query;
+  const skip = (page - 1) * limit;
+  const result = await contactsService.getContactsByFilter({ owner }, { skip, limit });
+  const total = await contactsService.getContactsCountByFilter({ owner });
+  res.json({ total, result });
 });
 
 export const getOneContact = ctrlWrapper(async (req, res) => {
   const { id } = req.params;
-  const result = await contactsService.getContactById(id);
+  const { _id: owner } = req.user;
+  const result = await contactsService.getOneContactByFilter({ _id: id, owner });
   if (!result) {
     throw HttpError(404, `Contact with id ${id} not found`);
   }
@@ -20,7 +25,8 @@ export const getOneContact = ctrlWrapper(async (req, res) => {
 
 export const deleteContact = ctrlWrapper(async (req, res) => {
   const { id } = req.params;
-  const result = await contactsService.removeContact(id);
+  const { _id: owner } = req.user;
+  const result = await contactsService.deleteContactByFilter({ _id: id, owner });
   if (!result) {
     throw HttpError(404, `Contact with id ${id} not found`);
   }
@@ -28,13 +34,15 @@ export const deleteContact = ctrlWrapper(async (req, res) => {
 });
 
 export const createContact = ctrlWrapper(async (req, res) => {
-  const result = await contactsService.addContact(req.body);
+  const { _id: owner } = req.user;
+  const result = await contactsService.addContact({ ...req.body, owner });
   res.status(201).json(result);
 });
 
 export const updateContact = ctrlWrapper(async (req, res) => {
   const { id } = req.params;
-  const result = await contactsService.updateContactById(id, req.body);
+  const { _id: owner } = req.user;
+  const result = await contactsService.updateContactByFilter({ _id: id, owner }, req.body);
   if (!result) {
     throw HttpError(404, `Contact with id ${id} not found`);
   }
@@ -43,9 +51,10 @@ export const updateContact = ctrlWrapper(async (req, res) => {
 
 export const updateStatusContact = ctrlWrapper(async (req, res) => {
   const { id } = req.params;
-  const result = await contactsService.updateStatus(id, req.body);
+  const { _id: owner } = req.user;
+  const result = await contactsService.updateStatusByFilter({ _id: id, owner }, req.body);
   if (!result) {
-    throw HttpError(404);
+    throw HttpError(404, `Contact with id ${id} not found`);
   }
   res.json(result);
 });
