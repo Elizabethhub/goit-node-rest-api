@@ -3,13 +3,19 @@ import * as contactsService from "../services/contactsServices.js";
 import ctrlWrapper from "../decorators/ctrlWrapper.js";
 
 import HttpError from "../helpers/HttpError.js";
+import { query } from "express";
 
 export const getAllContacts = ctrlWrapper(async (req, res) => {
   const { _id: owner } = req.user;
-  const { page = 1, limit = 10 } = req.query;
+  const { page = 1, limit = 20, favorite: favoriteValue } = req.query;
   const skip = (page - 1) * limit;
-  const result = await contactsService.getContactsByFilter({ owner }, { skip, limit });
-  const total = await contactsService.getContactsCountByFilter({ owner });
+  const favorite = favoriteValue === "true" ? true : favoriteValue === "false" ? false : null;
+  const queryCond = { owner };
+  if (favorite || favoriteValue === "false") {
+    queryCond.favorite = favorite;
+  }
+  const result = await contactsService.getContactsByFilter(queryCond, { skip, limit }); // skip - how much obj to skip
+  const total = await contactsService.getContactsCountByFilter(queryCond);
   res.json({ total, result });
 });
 

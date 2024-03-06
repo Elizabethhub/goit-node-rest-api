@@ -10,11 +10,11 @@ import authenticate from "../middlewares/authenticate.js";
 
 const authRouter = express.Router();
 
-authRouter.post("/signup", validateBody(signupSchema), authController.signup);
+authRouter.post("/register", validateBody(signupSchema), authController.signup);
 
-authRouter.post("/signin", validateBody(signinSchema), authController.signin);
+authRouter.post("/login", validateBody(signinSchema), authController.signin);
 
-authRouter.post("/signout", authenticate, authController.signout);
+authRouter.post("/logout", authenticate, authController.signout);
 
 authRouter.get("/current", authenticate, authController.getCurrent);
 
