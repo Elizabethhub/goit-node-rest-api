@@ -3,7 +3,6 @@ import * as contactsService from "../services/contactsServices.js";
 import ctrlWrapper from "../decorators/ctrlWrapper.js";
 
 import HttpError from "../helpers/HttpError.js";
-import { query } from "express";
 
 export const getAllContacts = ctrlWrapper(async (req, res) => {
   const { _id: owner } = req.user;

@@ -8,3 +8,5 @@ export const signup = async (data) => {
 };
 
 export const setToken = (id, token = "") => User.findByIdAndUpdate(id, { token });
+
+export const setSubscription = (id, subscription) => User.findByIdAndUpdate(id, { subscription }, { new: true });
