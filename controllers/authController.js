@@ -29,7 +29,7 @@ const signup = async (req, res) => {
     username: newUser.username,
     email: newUser.email,
     subscription: newUser.subscription,
-    avararURL: avatarURL,
+    avatarURL: avatarURL,
   });
 };
 
@@ -89,8 +89,8 @@ const updateAvatar = async (req, res) => {
     const newPath = path.join(contactsDir, newFileName);
     await fs.rename(oldPath, newPath);
     const avatarURL = path.join("avatars", newFileName);
-    const result = await authServices.setAvatar(_id, avatarURL);
-    res.json(result);
+    await authServices.setAvatar(_id, avatarURL);
+    res.json({ avatarURL });
   } catch (error) {
     await fs.unlink(tempStorage);
     throw error;
