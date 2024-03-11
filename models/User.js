@@ -21,6 +21,15 @@ const userSchema = new Schema(
       required: [true, "Password is required"],
       minlength: 6,
     },
+    verify: {
+      type: Boolean,
+      default: false,
+      required: true,
+    },
+    verificationCode: {
+      type: String,
+      required: [true, "Verify token is required"],
+    },
     subscription: {
       type: String,
       enum: ["starter", "pro", "business"],
