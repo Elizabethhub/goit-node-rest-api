@@ -17,6 +17,10 @@ const contactSchema = new Schema(
       type: Boolean,
       default: false,
     },
+    photo: {
+      type: String,
+      required: true,
+    },
     owner: {
       type: Schema.Types.ObjectId,
       ref: "user",

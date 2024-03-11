@@ -1,9 +1,15 @@
+import fs from "fs/promises";
+import path from "path";
+
 import * as contactsService from "../services/contactsServices.js";
 
 import ctrlWrapper from "../decorators/ctrlWrapper.js";
 
 import HttpError from "../helpers/HttpError.js";
+
 import { parseBoolean } from "../helpers/parser.js";
+
+const contactsDir = path.resolve("public", "avatars");
 
 export const getAllContacts = ctrlWrapper(async (req, res) => {
   const { _id: owner } = req.user;
@@ -40,8 +46,12 @@ export const deleteContact = ctrlWrapper(async (req, res) => {
 });
 
 export const createContact = ctrlWrapper(async (req, res) => {
+  const { path: oldPath, filename } = req.file;
+  const newPath = path.join(contactsDir, filename);
+  await fs.rename(oldPath, newPath);
   const { _id: owner } = req.user;
-  const result = await contactsService.addContact({ ...req.body, owner });
+  const photo = path.join("avatars", filename);
+  const result = await contactsService.addContact({ ...req.body, photo, owner });
   res.status(201).json(result);
 });
 

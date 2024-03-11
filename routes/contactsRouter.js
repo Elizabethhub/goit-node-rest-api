@@ -12,6 +12,7 @@ import { createContactSchema, updateContactSchema, updateStatusSchema } from "..
 
 import isValidId from "../middlewares/isValidId.js";
 import authenticate from "../middlewares/authenticate.js";
+import upload from "../middlewares/upload.js";
 
 const contactsRouter = express.Router();
 
@@ -23,7 +24,9 @@ contactsRouter.get("/:id", isValidId, getOneContact);
 
 contactsRouter.delete("/:id", isValidId, deleteContact);
 
-contactsRouter.post("/", validateBody(createContactSchema), createContact);
+//upload.fields([{name:"photo", maxcount: 1}]) // few fileds, one/few files
+//upload.aray("photo", 8) // one field, few files
+contactsRouter.post("/", upload.single("photo"), validateBody(createContactSchema), createContact); //one field, one file
 
 contactsRouter.put("/:id", isValidId, validateBody(updateContactSchema), updateContact);
 
